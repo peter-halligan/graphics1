@@ -8,13 +8,14 @@
 #include "freeglut.h"
 #include "stdio.h"
 #include "math.h"
-int windowSize = 1500;
-int worldSize = 500;
+int windowSize = 1000;
+int worldSize = 200;
 double radius = 10;
 double bodyRadius = radius;
 double lwr_arm_len = radius;
 double upr_arm_len = radius * 1.5;
 int arm_width = 3;
+bool boundingCircleIsVisisble = true;
 
 double black[] = { 0.0, 0.0, 0.0 };
 double colors[] = { 0.0, 0.0, 0.0 };
@@ -24,6 +25,7 @@ double blue[] = { 0.0, 1.0, 0.0 };
 
 void setClippingRectangle(void);
 void DrawCircle(float, float, float, int);
+void DrawBoundingCircle(float, float, float, int);
 void drawSquare(void);
 void drawUpperArm(void);
 void drawLowerArm(void);
@@ -54,51 +56,56 @@ void drawBadSpider(double *colors)
 	glColor3f(colors[0], colors[1], colors[2]);
 	glPointSize(2);
 	glPushMatrix();
-	drawBody();
-	glTranslatef(0, radius + (radius / 2), 0);
-	drawHead();
-	glPushMatrix();
-	glRotatef(-25, 0, 0, 1);
-	glTranslatef(0, (radius / 2) + (radius / 10), 0);
-	drawEye();
-	glPopMatrix();
-	glRotatef(25, 0, 0, 1);
-	glTranslatef(0, (radius / 2) + (radius / 10), 0);
-	drawEye();
+		drawBody();
+		glTranslatef(0, radius + (radius / 2), 0);
+		drawHead();
+			glPushMatrix();
+				glRotatef(-25, 0, 0, 1);
+				glTranslatef(0, (radius / 2) + (radius / 10), 0);
+				drawEye();
+			glPopMatrix();
+			glRotatef(25, 0, 0, 1);
+			glTranslatef(0, (radius / 2) + (radius / 10), 0);
+			drawEye();
 	// draw first leg
 	glPopMatrix();
 	glPushMatrix();
-	glTranslatef(upr_arm_len / 2, 0, 0);
-	drawUpperArm();
+		DrawBoundingCircle(0, 0, radius * 2, 360);
+	glPopMatrix();
+	glPushMatrix();
+		glColor3f(1.0, 0.0, 0.0);
+		glTranslatef(radius *.9, 0, 0);
+		drawUpperArm();
 	// draw lower leg
-	//glTranslatef((upr_arm_len / 2) + (lwr_arm_len / 2), 0, 0);
-	glTranslatef((upr_arm_len / 2), 0, 0);
-	glRotatef(-45, 0, 0, 1);
-	glTranslatef((lwr_arm_len / 2), 0, 0);
-	drawLowerArm();
+		glTranslatef((upr_arm_len*.43), 0, 0);
+		glRotatef(-45, 0, 0, 1);
+		drawLowerArm();
 	glPopMatrix();
 	//leg 2
 	glPushMatrix();
-	glRotatef(-45, 0, 0, 1);
-	glTranslatef(upr_arm_len / 2, 0, 0);
-	drawUpperArm();
-	glTranslatef((upr_arm_len / 2) + (lwr_arm_len / 2), 0, 0);
-	drawLowerArm();
+		glRotatef(-45, 0, 0, 1);
+		glTranslatef(radius*.9, 0, 0);
+		drawUpperArm();
+		glTranslatef((upr_arm_len*.43), 0, 0);
+		glRotatef(-45, 0, 0, 1);
+		drawLowerArm();
 	glPopMatrix();
 	//leg3
 	glPushMatrix();
-	glRotatef(45, 0, 0, 1);
-	glTranslatef(upr_arm_len / 2, 0, 0);
-	drawUpperArm();
-	glTranslatef((upr_arm_len / 2) + (lwr_arm_len / 2), 0, 0);
-	drawLowerArm();
+		glRotatef(45, 0, 0, 1);
+		glTranslatef(radius*.9, 0, 0);
+		drawUpperArm();
+		glTranslatef(upr_arm_len*.43, 0, 0);
+		glRotatef(-45, 0, 0, 1);
+		drawLowerArm();
 	glPopMatrix();
 	//le4
 	glPushMatrix();
-	glTranslatef(upr_arm_len / 2 * -1, 0, 0);
-	drawUpperArm();
-	glTranslatef(((upr_arm_len / 2) + (lwr_arm_len / 2))* -1, 0, 0);
-	drawLowerArm();
+		glTranslatef((radius + upr_arm_len / 2) * -1, 0, 0);
+		drawUpperArm();
+		glTranslatef(upr_arm_len *.1, 0, 0);
+		glRotatef(225, 0, 0, 1);
+		drawLowerArm();
 	glPopMatrix();
 	//leg5
 	glPushMatrix();
@@ -211,6 +218,27 @@ void drawHead(void)
 	DrawCircle(0, 0, radius, 360);
 	glPopMatrix();
 }
+void DrawBoundingCircle(float cx, float cy, float r, int num_segments)
+{
+	if (boundingCircleIsVisisble)
+	{
+		glBegin(GL_LINE_LOOP);
+		for (int ii = 0; ii < num_segments; ii++)
+		{
+			float theta = 2.0f * 3.1415926f * float(ii) / float(num_segments);//get the current angle 
+
+			float x = r * cosf(theta);//calculate the x component 
+			float y = r * sinf(theta);//calculate the y component 
+
+			glVertex2f(x + cx, y + cy);//output vertex 
+
+		}
+		glEnd();
+	}
+	else
+	{
+	}
+}
 void DrawCircle(float cx, float cy, float r, int num_segments)
 {
 	glBegin(GL_TRIANGLE_FAN);
@@ -231,10 +259,10 @@ void drawSquare(void)
 	glPointSize(10);
 
 	glBegin(GL_POLYGON);
-		glVertex3f(-.5, .5, 0);
+		glVertex3f(0, .5, 0);
 		glVertex3f(.5, .5, 0);
 		glVertex3f(.5, -.5, 0);
-		glVertex3f(-.5, -.5, 0);
+		glVertex3f(0, -.5, 0);
 	glEnd();
 
 }
