@@ -12,6 +12,7 @@
 #include "functionPrototypes.h"
 
 struct spider Enemy[5];
+struct spider hero;
 
 void initialaize(void)
 {
@@ -33,11 +34,24 @@ void initialaize(void)
 	Enemy[3].heading = RIGHT;
 
 	Enemy[4].x = (-worldSize / 2) + (radius * 2.5);
-	Enemy[4].y = (-worldSize / 2) + (radius * 2.5);;
+	Enemy[4].y = (-worldSize / 2) + (radius * 2.5);
 	Enemy[4].heading = RIGHT;
 
+	hero.x = 0;
+	hero.y = (-worldSize / 2) + (radius * 2.5);
+	hero.heading = 0;
 
-	
+	for (int j = 0; j < 3; j++)
+	{
+		hero.colour[j] = black[j];
+	}
+	for (int i = 0; i < 5; i++)
+	{
+		for (int j = 0; j < 3; j++)
+		{
+			Enemy[i].colour[j] = red[j];
+		}
+	}
 }
 void display(void)
 {
@@ -53,7 +67,7 @@ void display(void)
 			glPushMatrix();
 			glTranslatef(Enemy[i].x, Enemy[i].y, 0);
 			glRotatef(Enemy[i].heading, 0, 0, 1);
-			drawSpider(colors);
+			drawSpider(Enemy[i].colour);
 			glPopMatrix();
 		}
 	}
@@ -64,10 +78,15 @@ void display(void)
 			glPushMatrix();
 			glTranslatef(Enemy[i].x, Enemy[i].y, 0);
 			glRotatef(Enemy[i].heading, 0, 0, 1);
-			drawSpider(colors);
+			drawSpider(Enemy[i].colour);
 			glPopMatrix();
 		}
 	}
+	glPushMatrix();
+	glTranslatef(hero.x, hero.y, 0);
+	glRotatef(hero.heading, 0, 0, 1);
+	drawSpider(hero.colour);
+	glPopMatrix();
 	glFlush();
 }
 
@@ -178,7 +197,7 @@ void drawHead(void)
 void DrawBoundingCircle(float cx, float cy, float r, int num_segments, float * colour)
 {
 
-	if (boundingCircleIsVisisble)
+	if (boundingCircleIsVisible)
 	{
 		glColor3f(black[0], black[1], black[2]);
 		glBegin(GL_LINE_LOOP);
@@ -256,51 +275,60 @@ void keyboard(unsigned char key, int x, int y)
 {
 	switch (key)
 	{
-	case 48:
+	case RESETBKG:
 		glClearColor(1.0, 1.0, 1.0, 1.0);
 		glutPostRedisplay();
 		break;
-	case 49:
-		glClearColor(0.0, 1.0, 0.0, 1.0);
+	case GREENBKG:
+		glClearColor(0.0, .4, 0.0, 1.0);
 		glutPostRedisplay();
 		break;
-	case 50:
+	case BLUEBKG:
 		glClearColor(0.0, 0.0, 1.0, 1.0);
 		glutPostRedisplay();
 		break;
-	case 51:
+	case PURPLEBKG:
 		glClearColor(0.45, 0.1, .48, 1.0);
 		glutPostRedisplay();
 		break;
-	case 52:
+	case REDSPIDER:
+		for (int j = 0; j < 5; j++)
+		{
+			for (int i = 0; i < 3; i++)
+			{
+				Enemy[j].colour[i] = red[i];
+			}
+		}
+		glutPostRedisplay();
+		break;
+	case GREENSPIDER:
+		for (int j = 0; j < 5; j++)
+		{
+			for (int i = 0; i < 3; i++)
+			{
+				Enemy[j].colour[i] = green[i];
+			}
+		}
+		glutPostRedisplay();
+		break;
+	case BLUESPIDER:
+		for (int j = 0; j < 5; j++)
+		{
+			for (int i = 0; i < 3; i++)
+			{
+				Enemy[j].colour[i] = blue[i];
+			}
+		}
+		glutPostRedisplay();
+		break;
+	case RESET:
 		for (int i = 0; i < 3; i++)
 		{
 			colors[i] = red[i];
 		}
 		glutPostRedisplay();
 		break;
-	case 53:
-		for (int i = 0; i < 3; i++)
-		{
-			colors[i] = green[i];
-		}
-		glutPostRedisplay();
-		break;
-	case 54:
-		for(int i = 0; i < 3; i++)
-		{
-			colors[i] = blue[i];
-		}
-		glutPostRedisplay();
-		break;
-	case 57:
-		for (int i = 0; i < 3; i++)
-		{
-			colors[i] = black[i];
-		}
-		glutPostRedisplay();
-		break;
-	case 109:
+	case MODE:
 		if (easy == true)
 		{
 			easy = false;
@@ -311,7 +339,22 @@ void keyboard(unsigned char key, int x, int y)
 		}
 		glutPostRedisplay();
 		break;
+	case SHOWCIRCLE:
+		if (boundingCircleIsVisible)
+		{
+			boundingCircleIsVisible = false;
+		}
+		else
+		{
+			boundingCircleIsVisible = true;
+		}
+		glutPostRedisplay();
+		break;
+	case FORWARD:
+		hero.x = 
+		break;
 	default:
+
 		break;
 	}
 }
