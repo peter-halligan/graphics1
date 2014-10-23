@@ -2,56 +2,76 @@
 //
 
 #include "stdafx.h"
-// A basic OpenGL program displaying a 2D house shape
+//Assignment1
 
 #include <windows.h>
 #include "freeglut.h"
 #include "stdio.h"
 #include "math.h"
-int windowSize = 1000;
-int worldSize = 200;
-double radius = 10;
-double bodyRadius = radius;
-double lwr_arm_len = radius;
-double upr_arm_len = radius * 1.5;
-int arm_width = 3;
-bool boundingCircleIsVisisble = true;
+#include "variables.h"
+#include "functionPrototypes.h"
 
-double black[] = { 0.0, 0.0, 0.0 };
-double colors[] = { 0.0, 0.0, 0.0 };
-double red[] = { 1.0, 0.0, 0.0 };
-double green[] = { 0.0, 0.0, 1.0 };
-double blue[] = { 0.0, 1.0, 0.0 };
+struct spider Enemy[5];
 
-void setClippingRectangle(void);
-void DrawCircle(float, float, float, int);
-void DrawBoundingCircle(float, float, float, int);
-void drawSquare(void);
-void drawUpperArm(void);
-void drawLowerArm(void);
-void drawBody(void);
-void drawHead(void);
-void drawEye(void);
-void drawSpider();
-void drawBadSpider(double *);
+void initialaize(void)
+{
 
+	Enemy[0].x = (-worldSize / 2) + (radius * 2.5);
+	Enemy[0].y = (worldSize / 2) - (radius * 2.5);
+	Enemy[0].heading = RIGHT;
+
+	Enemy[1].x = (-worldSize / 2) + (radius * 2.5);
+	Enemy[1].y = (worldSize / 5);
+	Enemy[1].heading = RIGHT;
+
+	Enemy[2].x = (-worldSize / 2) + (radius * 2.5);
+	Enemy[2].y = 0;
+	Enemy[2].heading = RIGHT;
+
+	Enemy[3].x = (-worldSize / 2) + (radius * 2.5);
+	Enemy[3].y = (-worldSize / 5);
+	Enemy[3].heading = RIGHT;
+
+	Enemy[4].x = (-worldSize / 2) + (radius * 2.5);
+	Enemy[4].y = (-worldSize / 2) + (radius * 2.5);;
+	Enemy[4].heading = RIGHT;
+
+
+	
+}
 void display(void)
 {
-	// draw edges of house in red
 
 	// clear all pixels in frame buffer
 	glClear(GL_COLOR_BUFFER_BIT);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	glPushMatrix();
-	//glTranslatef((-worldSize/2)+20, (worldSize/3)-20 , 0);
-	//glRotatef(90, 0, 0, 1);
-	drawBadSpider(colors);
-	glPopMatrix();
+	if (easy)
+	{
+		for (int i = 0; i < 5; i+=2)
+		{
+			glPushMatrix();
+			glTranslatef(Enemy[i].x, Enemy[i].y, 0);
+			glRotatef(Enemy[i].heading, 0, 0, 1);
+			drawSpider(colors);
+			glPopMatrix();
+		}
+	}
+	else
+	{
+		for (int i = 0; i < 5; i++)
+		{
+			glPushMatrix();
+			glTranslatef(Enemy[i].x, Enemy[i].y, 0);
+			glRotatef(Enemy[i].heading, 0, 0, 1);
+			drawSpider(colors);
+			glPopMatrix();
+		}
+	}
 	glFlush();
 }
 
-void drawBadSpider(double *colors)
+void drawSpider(float *colors)
 {
 	glColor3f(colors[0], colors[1], colors[2]);
 	glPointSize(2);
@@ -70,10 +90,9 @@ void drawBadSpider(double *colors)
 	// draw first leg
 	glPopMatrix();
 	glPushMatrix();
-		DrawBoundingCircle(0, 0, radius * 2, 360);
+		DrawBoundingCircle(0, 0, radius * 2, 360,colors);
 	glPopMatrix();
 	glPushMatrix();
-		glColor3f(1.0, 0.0, 0.0);
 		glTranslatef(radius *.9, 0, 0);
 		drawUpperArm();
 	// draw lower leg
@@ -103,100 +122,38 @@ void drawBadSpider(double *colors)
 	glPushMatrix();
 		glTranslatef((radius + upr_arm_len / 2) * -1, 0, 0);
 		drawUpperArm();
-		glTranslatef(upr_arm_len *.1, 0, 0);
+		glTranslatef(upr_arm_len *.1  , 0, 0);
 		glRotatef(225, 0, 0, 1);
 		drawLowerArm();
 	glPopMatrix();
 	//leg5
 	glPushMatrix();
-	glRotatef(45, 0, 0, 1);
-	glTranslatef(upr_arm_len / 2 * -1, 0, 0);
-	drawUpperArm();
-	glTranslatef(((upr_arm_len / 2) + (lwr_arm_len / 2))* -1, 0, 0);
-	drawLowerArm();
+		glRotatef(45, 0, 0, 1);
+		glTranslatef(((radius *.9) + upr_arm_len / 2) * -1, 0, 0);
+		drawUpperArm();
+		glTranslatef(upr_arm_len *.1, 0, 0);
+		glRotatef(225, 0, 0, 1);
+		drawLowerArm();
 	glPopMatrix();
 	//leg6
 	glPushMatrix();
-	glRotatef(-45, 0, 0, 1);
-	glTranslatef(upr_arm_len / 2 * -1, 0, 0);
-	drawUpperArm();
-	glTranslatef(((upr_arm_len / 2) + (lwr_arm_len / 2))* -1, 0, 0);
-	drawLowerArm();
+		glRotatef(-45, 0, 0, 1);
+		glTranslatef(((radius*.9) + upr_arm_len / 2) * -1, 0, 0);
+		drawUpperArm();
+		glTranslatef(upr_arm_len *.1, 0, 0);
+		glRotatef(225, 0, 0, 1);
+		drawLowerArm();
 	glPopMatrix();
 }
 
-void drawSpider()
-{
-	glColor3f(0.0, 0.0, 0.0);
-	glPointSize(2);
-	glPushMatrix();
-	drawBody();
-	glTranslatef(0, radius + (radius / 2), 0);
-	drawHead();
-	glPushMatrix();
-	glRotatef(-25, 0, 0, 1);
-	glTranslatef(0, (radius / 2) + (radius / 10), 0);
-	drawEye();
-	glPopMatrix();
-	glRotatef(25, 0, 0, 1);
-	glTranslatef(0, (radius / 2) + (radius / 10), 0);
-	drawEye();
-	// draw first leg
-	glPopMatrix();
-	glPushMatrix();
-	glTranslatef(upr_arm_len / 2, 0, 0);
-	drawUpperArm();
-	// draw lower leg
-	glTranslatef((upr_arm_len / 2) + (lwr_arm_len / 2), 0, 0);
-	drawLowerArm();
-	glPopMatrix();
-	//leg 2
-	glPushMatrix();
-	glRotatef(-45, 0, 0, 1);
-	glTranslatef(upr_arm_len / 2, 0, 0);
-	drawUpperArm();
-	glTranslatef((upr_arm_len / 2) + (lwr_arm_len / 2), 0, 0);
-	drawLowerArm();
-	glPopMatrix();
-	//leg3
-	glPushMatrix();
-	glRotatef(45, 0, 0, 1);
-	glTranslatef(upr_arm_len / 2, 0, 0);
-	drawUpperArm();
-	glTranslatef((upr_arm_len / 2) + (lwr_arm_len / 2), 0, 0);
-	drawLowerArm();
-	glPopMatrix();
-	//le4
-	glPushMatrix();
-	glTranslatef(upr_arm_len / 2 * -1, 0, 0);
-	drawUpperArm();
-	glTranslatef(((upr_arm_len / 2) + (lwr_arm_len / 2))* -1, 0, 0);
-	drawLowerArm();
-	glPopMatrix();
-	//leg5
-	glPushMatrix();
-	glRotatef(45, 0, 0, 1);
-	glTranslatef(upr_arm_len / 2 * -1, 0, 0);
-	drawUpperArm();
-	glTranslatef(((upr_arm_len / 2) + (lwr_arm_len / 2))* -1, 0, 0);
-	drawLowerArm();
-	glPopMatrix();
-	//leg6
-	glPushMatrix();
-	glRotatef(-45, 0, 0, 1);
-	glTranslatef(upr_arm_len / 2 * -1, 0, 0);
-	drawUpperArm();
-	glTranslatef(((upr_arm_len / 2) + (lwr_arm_len / 2))* -1, 0, 0);
-	drawLowerArm();
-	glPopMatrix();
-}
+
 void init(void)
 {
 	// select clearing color (for glClear)
 	glClearColor(1.0, 1.0, 1.0, 0.0);	// RGB-value for white
 	setClippingRectangle();
 	// initialize view (simple orthographic projection)
-
+	initialaize();
 }
 void drawEye(void)
 {
@@ -218,10 +175,12 @@ void drawHead(void)
 	DrawCircle(0, 0, radius, 360);
 	glPopMatrix();
 }
-void DrawBoundingCircle(float cx, float cy, float r, int num_segments)
+void DrawBoundingCircle(float cx, float cy, float r, int num_segments, float * colour)
 {
+
 	if (boundingCircleIsVisisble)
 	{
+		glColor3f(black[0], black[1], black[2]);
 		glBegin(GL_LINE_LOOP);
 		for (int ii = 0; ii < num_segments; ii++)
 		{
@@ -238,6 +197,7 @@ void DrawBoundingCircle(float cx, float cy, float r, int num_segments)
 	else
 	{
 	}
+	glColor3f(colour[0], colour[1], colour[2]);
 }
 void DrawCircle(float cx, float cy, float r, int num_segments)
 {
@@ -269,8 +229,8 @@ void drawSquare(void)
 void drawLowerArm()
 {
 	glPushMatrix();
-	glScalef(lwr_arm_len, arm_width, 0);
-	drawSquare();
+		glScalef(lwr_arm_len, arm_width, 0);
+		drawSquare();
 	glPopMatrix();
 }
 void drawUpperArm()
@@ -287,7 +247,7 @@ void setClippingRectangle(void)
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	GLdouble halfWorldWidth = worldSize / 2;
-	GLdouble halfWorldHeight = worldSize / 3;
+	GLdouble halfWorldHeight = worldSize / 2;
 	gluOrtho2D(-halfWorldWidth, halfWorldWidth, -halfWorldHeight, halfWorldHeight);
 	glutPostRedisplay();
 }
@@ -317,7 +277,6 @@ void keyboard(unsigned char key, int x, int y)
 		{
 			colors[i] = red[i];
 		}
-		drawBadSpider(colors);
 		glutPostRedisplay();
 		break;
 	case 53:
@@ -325,7 +284,6 @@ void keyboard(unsigned char key, int x, int y)
 		{
 			colors[i] = green[i];
 		}
-		drawBadSpider(colors);
 		glutPostRedisplay();
 		break;
 	case 54:
@@ -333,7 +291,6 @@ void keyboard(unsigned char key, int x, int y)
 		{
 			colors[i] = blue[i];
 		}
-		drawBadSpider(colors);
 		glutPostRedisplay();
 		break;
 	case 57:
@@ -341,7 +298,17 @@ void keyboard(unsigned char key, int x, int y)
 		{
 			colors[i] = black[i];
 		}
-		drawSpider();
+		glutPostRedisplay();
+		break;
+	case 109:
+		if (easy == true)
+		{
+			easy = false;
+		}
+		else
+		{
+			easy = true;
+		}
 		glutPostRedisplay();
 		break;
 	default:
