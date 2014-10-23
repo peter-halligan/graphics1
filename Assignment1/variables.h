@@ -14,8 +14,8 @@
 #define RESET 57
 #define MODE 109
 
-#define LEFT 97
-#define RIGHT 115
+#define MOVELEFT 97
+#define MOVERIGHT 115
 #define FORWARD 119
 #define BACKWARDS 122
 

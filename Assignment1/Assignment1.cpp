@@ -351,10 +351,42 @@ void keyboard(unsigned char key, int x, int y)
 		glutPostRedisplay();
 		break;
 	case FORWARD:
-		hero.x = 
+		if (hero.x + (radius * 2) < (worldSize /2 ) && hero.x - (radius*2) > (-worldSize /2))
+		{
+			hero.x += radius * -sinf(hero.heading * M_PI / 180);
+			hero.y += radius * cosf(hero.heading * M_PI / 180);
+		}
+		else
+		{
+			hero.heading *= -1;
+			hero.x += radius * -sinf(hero.heading * M_PI / 180);
+			hero.y += radius * cosf(hero.heading * M_PI / 180);
+		}
+		glutPostRedisplay();
+		break;
+	case MOVELEFT:
+		hero.heading += radius;
+		glutPostRedisplay();
+		break;
+	case MOVERIGHT:
+		hero.heading -= radius;
+		glutPostRedisplay();
+		break;
+	case BACKWARDS:
+		if (hero.x + (radius * 2) < (worldSize / 2) && hero.x - (radius * 2) > (-worldSize / 2))
+		{
+			hero.x -= radius * -sinf(hero.heading * M_PI / 180);
+			hero.y -= radius * cosf(hero.heading * M_PI / 180);
+		}
+		else
+		{
+			hero.heading *= -1;
+			hero.x -= radius * -sinf(hero.heading * M_PI / 180);
+			hero.y -= radius * cosf(hero.heading * M_PI / 180);
+		}
+		glutPostRedisplay();
 		break;
 	default:
-
 		break;
 	}
 }
