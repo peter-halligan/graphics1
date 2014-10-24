@@ -41,4 +41,5 @@ struct spider
 	double y;
 	double heading;
 	float colour[3];
+	float speed;
 };

@@ -10,36 +10,51 @@
 #include "math.h"
 #include "variables.h"
 #include "functionPrototypes.h"
+#include "ctime"
+#include "cstdlib"
 
 struct spider Enemy[5];
 struct spider hero;
+float rightLegAngle = -90;
+float leftLegAngle = 225;
+bool legForward = true;
+bool rightLegForward = true;
 
 void initialaize(void)
 {
+	srand((unsigned)time(0));
 
 	Enemy[0].x = (-worldSize / 2) + (radius * 2.5);
 	Enemy[0].y = (worldSize / 2) - (radius * 2.5);
 	Enemy[0].heading = RIGHT;
+	Enemy[0].speed = radius;
+		// ((rand() % 100 + 1)/ 100);
 
 	Enemy[1].x = (-worldSize / 2) + (radius * 2.5);
 	Enemy[1].y = (worldSize / 5);
 	Enemy[1].heading = RIGHT;
+	Enemy[1].speed = radius / 2;
+	//((rand() % 100 + 1) / 100);
 
 	Enemy[2].x = (-worldSize / 2) + (radius * 2.5);
 	Enemy[2].y = 0;
 	Enemy[2].heading = RIGHT;
+	Enemy[2].speed = radius / 4;
 
 	Enemy[3].x = (-worldSize / 2) + (radius * 2.5);
 	Enemy[3].y = (-worldSize / 5);
 	Enemy[3].heading = RIGHT;
+	Enemy[3].speed = radius;
 
 	Enemy[4].x = (-worldSize / 2) + (radius * 2.5);
 	Enemy[4].y = (-worldSize / 2) + (radius * 2.5);
 	Enemy[4].heading = RIGHT;
+	Enemy[4].speed = radius / 2;
 
 	hero.x = 0;
 	hero.y = (-worldSize / 2) + (radius * 2.5);
 	hero.heading = 0;
+	hero.speed = radius;
 
 	for (int j = 0; j < 3; j++)
 	{
@@ -89,7 +104,77 @@ void display(void)
 	glPopMatrix();
 	glFlush();
 }
+void death(int value)
+{
+	for (int i = 0; i < 5; i++)
+	{
+		if (Enemy[i].y >(-worldSize / 2) + (radius * 2))
+		{
+			Enemy[i].y -= radius;
+			Enemy[i].speed = 0;
+		}
+	}
+	glutPostRedisplay();
+	glutTimerFunc(100, death, 2);
+}
+void drawRightLegs(float angle)
+{
+	glPushMatrix();
+		glTranslatef(radius *.9, 0, 0);
+		drawUpperArm();
+		// draw lower leg
+		glTranslatef((upr_arm_len*.43), 0, 0);
+		glRotatef(angle, 0, 0, 1);
+		drawLowerArm();
+	glPopMatrix();
 
+	glPushMatrix();
+		glRotatef(-45, 0, 0, 1);
+		glTranslatef(radius*.9, 0, 0);
+		drawUpperArm();
+		glTranslatef((upr_arm_len*.43), 0, 0);
+		glRotatef(angle, 0, 0, 1);
+		drawLowerArm();
+	glPopMatrix();
+	//leg3
+	glPushMatrix();
+		glRotatef(45, 0, 0, 1);
+		glTranslatef(radius*.9, 0, 0);
+		drawUpperArm();
+		glTranslatef(upr_arm_len*.43, 0, 0);
+		glRotatef(angle, 0, 0, 1);
+		drawLowerArm();
+	glPopMatrix();
+}
+
+void drawLeftLegs(float angle)
+{
+	glPushMatrix();
+		glTranslatef((radius + upr_arm_len / 2) * -1, 0, 0);
+		drawUpperArm();
+		glTranslatef(upr_arm_len *.1, 0, 0);
+		glRotatef(angle, 0, 0, 1);
+		drawLowerArm();
+	glPopMatrix();
+	//leg5
+	glPushMatrix();
+		glRotatef(45, 0, 0, 1);
+		glTranslatef(((radius *.9) + upr_arm_len / 2) * -1, 0, 0);
+		drawUpperArm();
+		glTranslatef(upr_arm_len *.1, 0, 0);
+		glRotatef(angle, 0, 0, 1);
+		drawLowerArm();
+	glPopMatrix();
+	//leg6
+	glPushMatrix();
+		glRotatef(-45, 0, 0, 1);
+		glTranslatef(((radius*.9) + upr_arm_len / 2) * -1, 0, 0);
+		drawUpperArm();
+		glTranslatef(upr_arm_len *.1, 0, 0);
+		glRotatef(angle, 0, 0, 1);
+	drawLowerArm();
+	glPopMatrix();
+}
 void drawSpider(float *colors)
 {
 	glColor3f(colors[0], colors[1], colors[2]);
@@ -106,62 +191,13 @@ void drawSpider(float *colors)
 			glRotatef(25, 0, 0, 1);
 			glTranslatef(0, (radius / 2) + (radius / 10), 0);
 			drawEye();
-	// draw first leg
-	glPopMatrix();
+	//bounding circle
+		glPopMatrix();
 	glPushMatrix();
 		DrawBoundingCircle(0, 0, radius * 2, 360,colors);
 	glPopMatrix();
-	glPushMatrix();
-		glTranslatef(radius *.9, 0, 0);
-		drawUpperArm();
-	// draw lower leg
-		glTranslatef((upr_arm_len*.43), 0, 0);
-		glRotatef(-45, 0, 0, 1);
-		drawLowerArm();
-	glPopMatrix();
-	//leg 2
-	glPushMatrix();
-		glRotatef(-45, 0, 0, 1);
-		glTranslatef(radius*.9, 0, 0);
-		drawUpperArm();
-		glTranslatef((upr_arm_len*.43), 0, 0);
-		glRotatef(-45, 0, 0, 1);
-		drawLowerArm();
-	glPopMatrix();
-	//leg3
-	glPushMatrix();
-		glRotatef(45, 0, 0, 1);
-		glTranslatef(radius*.9, 0, 0);
-		drawUpperArm();
-		glTranslatef(upr_arm_len*.43, 0, 0);
-		glRotatef(-45, 0, 0, 1);
-		drawLowerArm();
-	glPopMatrix();
-	//le4
-	glPushMatrix();
-		glTranslatef((radius + upr_arm_len / 2) * -1, 0, 0);
-		drawUpperArm();
-		glTranslatef(upr_arm_len *.1  , 0, 0);
-		glRotatef(225, 0, 0, 1);
-		drawLowerArm();
-	glPopMatrix();
-	//leg5
-	glPushMatrix();
-		glRotatef(45, 0, 0, 1);
-		glTranslatef(((radius *.9) + upr_arm_len / 2) * -1, 0, 0);
-		drawUpperArm();
-		glTranslatef(upr_arm_len *.1, 0, 0);
-		glRotatef(225, 0, 0, 1);
-		drawLowerArm();
-	glPopMatrix();
-	//leg6
-	glPushMatrix();
-		glRotatef(-45, 0, 0, 1);
-		glTranslatef(((radius*.9) + upr_arm_len / 2) * -1, 0, 0);
-		drawUpperArm();
-		glTranslatef(upr_arm_len *.1, 0, 0);
-		glRotatef(225, 0, 0, 1);
-		drawLowerArm();
+		drawRightLegs(rightLegAngle);
+		drawLeftLegs(leftLegAngle);
 	glPopMatrix();
 }
 
@@ -332,10 +368,12 @@ void keyboard(unsigned char key, int x, int y)
 		if (easy == true)
 		{
 			easy = false;
+			radius /=2;
 		}
 		else
 		{
 			easy = true;
+			radius *= 2;
 		}
 		glutPostRedisplay();
 		break;
@@ -353,8 +391,15 @@ void keyboard(unsigned char key, int x, int y)
 	case FORWARD:
 		if (hero.x + (radius * 2) < (worldSize /2 ) && hero.x - (radius*2) > (-worldSize /2))
 		{
-			hero.x += radius * -sinf(hero.heading * M_PI / 180);
-			hero.y += radius * cosf(hero.heading * M_PI / 180);
+			if (hero.y + (radius * 2) < (worldSize / 2))
+			{
+				hero.x += radius * -sinf(hero.heading * M_PI / 180);
+				hero.y += radius * cosf(hero.heading * M_PI / 180);
+			}
+			else
+			{
+				glutTimerFunc(100, death, 2);
+			}
 		}
 		else
 		{
@@ -375,14 +420,14 @@ void keyboard(unsigned char key, int x, int y)
 	case BACKWARDS:
 		if (hero.x + (radius * 2) < (worldSize / 2) && hero.x - (radius * 2) > (-worldSize / 2))
 		{
-			hero.x -= radius * -sinf(hero.heading * M_PI / 180);
-			hero.y -= radius * cosf(hero.heading * M_PI / 180);
+			hero.x -= hero.speed * -sinf(hero.heading * M_PI / 180);
+			hero.y -= hero.speed * cosf(hero.heading * M_PI / 180);
 		}
 		else
 		{
 			hero.heading *= -1;
-			hero.x -= radius * -sinf(hero.heading * M_PI / 180);
-			hero.y -= radius * cosf(hero.heading * M_PI / 180);
+			hero.x -= hero.speed * -sinf(hero.heading * M_PI / 180);
+			hero.y -= hero.speed * cosf(hero.heading * M_PI / 180);
 		}
 		glutPostRedisplay();
 		break;
@@ -390,7 +435,74 @@ void keyboard(unsigned char key, int x, int y)
 		break;
 	}
 }
+void animateLeftLeg()
+{
+	if (legForward == true && leftLegAngle < 270)
+	{
+		leftLegAngle += 1;
+	}
+	else
+	{
+		legForward = false;
+	}
+	if (legForward == false && leftLegAngle > 225)
+	{
+		leftLegAngle -= 1;
+	}
+	else
+	{
+		legForward = true;
+	}
+}
+void animateRightLeg()
+{
+		if (rightLegForward == true && rightLegAngle < -40)
+		{
+			rightLegAngle += 1;
+		}
+		else
+		{
+			rightLegForward = false;
+		}
 
+		if (rightLegForward == false && rightLegAngle > -90)
+		{
+			rightLegAngle -= 1;
+		}
+		else
+		{
+			rightLegForward = true;
+		}
+}
+void amination(int value)
+{
+	for (int i = 0; i < 5; i++)
+	{
+
+		animateLeftLeg();
+		animateRightLeg();
+
+		if (Enemy[i].heading == RIGHT && Enemy[i].x + (radius * 2) < (worldSize / 2))
+		{
+			Enemy[i].x += Enemy[i].speed;
+		}
+		else
+		{
+			Enemy[i].heading = LEFT;
+		}
+
+		if (Enemy[i].heading == LEFT && Enemy[i].x + (-radius * 2) > (-worldSize / 2))
+		{
+			Enemy[i].x -= Enemy[i].speed;
+		}
+		else
+		{
+			Enemy[i].heading = RIGHT;
+		}
+	}
+	glutPostRedisplay();
+	glutTimerFunc(100, amination, 1);
+}
 
 // create a single buffered colour window
 int main(int argc, char** argv)
@@ -405,6 +517,8 @@ int main(int argc, char** argv)
 	init();						// initialise view
 	glutDisplayFunc(display);		// draw scene
 	glutKeyboardFunc(keyboard);
+	glutTimerFunc(100, amination, 1);
+	//glutTimerFunc(100, death, 2);
 	glutMainLoop();
 	return 0;
 }
