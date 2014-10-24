@@ -10,36 +10,47 @@
 #include "math.h"
 #include "variables.h"
 #include "functionPrototypes.h"
+#include "ctime"
+#include "cstdlib"
 
 struct spider Enemy[5];
 struct spider hero;
 
 void initialaize(void)
 {
+	srand((unsigned)time(0));
 
 	Enemy[0].x = (-worldSize / 2) + (radius * 2.5);
 	Enemy[0].y = (worldSize / 2) - (radius * 2.5);
 	Enemy[0].heading = RIGHT;
+	Enemy[0].speed = radius;
+		// ((rand() % 100 + 1)/ 100);
 
 	Enemy[1].x = (-worldSize / 2) + (radius * 2.5);
 	Enemy[1].y = (worldSize / 5);
 	Enemy[1].heading = RIGHT;
+	Enemy[1].speed = radius / 2;
+	//((rand() % 100 + 1) / 100);
 
 	Enemy[2].x = (-worldSize / 2) + (radius * 2.5);
 	Enemy[2].y = 0;
 	Enemy[2].heading = RIGHT;
+	Enemy[2].speed = radius / 4;
 
 	Enemy[3].x = (-worldSize / 2) + (radius * 2.5);
 	Enemy[3].y = (-worldSize / 5);
 	Enemy[3].heading = RIGHT;
+	Enemy[3].speed = radius;
 
 	Enemy[4].x = (-worldSize / 2) + (radius * 2.5);
 	Enemy[4].y = (-worldSize / 2) + (radius * 2.5);
 	Enemy[4].heading = RIGHT;
+	Enemy[4].speed = radius / 2;
 
 	hero.x = 0;
 	hero.y = (-worldSize / 2) + (radius * 2.5);
 	hero.heading = 0;
+	hero.speed = radius;
 
 	for (int j = 0; j < 3; j++)
 	{
@@ -89,7 +100,19 @@ void display(void)
 	glPopMatrix();
 	glFlush();
 }
-
+void death(int value)
+{
+	for (int i = 0; i < 5; i++)
+	{
+		if (Enemy[i].y >(-worldSize / 2) + (radius * 2))
+		{
+			Enemy[i].y -= radius;
+			Enemy[i].speed = 0;
+		}
+	}
+	glutPostRedisplay();
+	glutTimerFunc(100, death, 2);
+}
 void drawSpider(float *colors)
 {
 	glColor3f(colors[0], colors[1], colors[2]);
@@ -332,10 +355,12 @@ void keyboard(unsigned char key, int x, int y)
 		if (easy == true)
 		{
 			easy = false;
+			radius /=2;
 		}
 		else
 		{
 			easy = true;
+			radius *= 2;
 		}
 		glutPostRedisplay();
 		break;
@@ -353,8 +378,24 @@ void keyboard(unsigned char key, int x, int y)
 	case FORWARD:
 		if (hero.x + (radius * 2) < (worldSize /2 ) && hero.x - (radius*2) > (-worldSize /2))
 		{
-			hero.x += radius * -sinf(hero.heading * M_PI / 180);
-			hero.y += radius * cosf(hero.heading * M_PI / 180);
+			if (hero.y + (radius * 2) < (worldSize / 2))
+			{
+				hero.x += radius * -sinf(hero.heading * M_PI / 180);
+				hero.y += radius * cosf(hero.heading * M_PI / 180);
+			}
+			else
+			{
+				glutTimerFunc(100, death, 2);
+				/*
+				for (int i = 0; i < 5; i++)
+				{
+					while (Enemy[i].y > -(worldSize / 2) + radius * 2)
+					{
+						Enemy[i].y -= radius;
+					}
+				}
+				*/
+			}
 		}
 		else
 		{
@@ -375,14 +416,14 @@ void keyboard(unsigned char key, int x, int y)
 	case BACKWARDS:
 		if (hero.x + (radius * 2) < (worldSize / 2) && hero.x - (radius * 2) > (-worldSize / 2))
 		{
-			hero.x -= radius * -sinf(hero.heading * M_PI / 180);
-			hero.y -= radius * cosf(hero.heading * M_PI / 180);
+			hero.x -= hero.speed * -sinf(hero.heading * M_PI / 180);
+			hero.y -= hero.speed * cosf(hero.heading * M_PI / 180);
 		}
 		else
 		{
 			hero.heading *= -1;
-			hero.x -= radius * -sinf(hero.heading * M_PI / 180);
-			hero.y -= radius * cosf(hero.heading * M_PI / 180);
+			hero.x -= hero.speed * -sinf(hero.heading * M_PI / 180);
+			hero.y -= hero.speed * cosf(hero.heading * M_PI / 180);
 		}
 		glutPostRedisplay();
 		break;
@@ -390,7 +431,31 @@ void keyboard(unsigned char key, int x, int y)
 		break;
 	}
 }
+void amination(int value)
+{
+	for (int i = 0; i < 5; i++)
+	{
+		if (Enemy[i].heading == RIGHT && Enemy[i].x + (radius * 2) < (worldSize / 2))
+		{
+			Enemy[i].x += Enemy[i].speed;
+		}
+		else
+		{
+			Enemy[i].heading = LEFT;
+		}
 
+		if (Enemy[i].heading == LEFT && Enemy[i].x + (-radius * 2) > (-worldSize / 2))
+		{
+			Enemy[i].x -= Enemy[i].speed;
+		}
+		else
+		{
+			Enemy[i].heading = RIGHT;
+		}
+	}
+	glutPostRedisplay();
+	glutTimerFunc(20, amination, 1);
+}
 
 // create a single buffered colour window
 int main(int argc, char** argv)
@@ -405,6 +470,8 @@ int main(int argc, char** argv)
 	init();						// initialise view
 	glutDisplayFunc(display);		// draw scene
 	glutKeyboardFunc(keyboard);
+	glutTimerFunc(100, amination, 1);
+	//glutTimerFunc(100, death, 2);
 	glutMainLoop();
 	return 0;
 }
