@@ -20,6 +20,7 @@ float leftLegAngle = 225;
 bool legForward = true;
 bool rightLegForward = true;
 void lookForCollision(struct spider enemy, struct spider hero);
+void collisionTimer(int);
 
 void initialaize(void)
 {
@@ -107,7 +108,7 @@ void display(void)
 	glRotatef(hero.heading, 0, 0, 1);
 	drawSpider(hero.colour);
 	glPopMatrix();
-	glFlush();
+	glutSwapBuffers();
 }
 void death(int value)
 {
@@ -488,50 +489,64 @@ void animateRightLeg()
 }
 void amination(int value)
 {
-	for (int i = 0; i < 5; i++)
-	{
-		animateLeftLeg();
-		animateRightLeg();
-
-		if (Enemy[i].heading == RIGHT && Enemy[i].x + (radius * 2) < (worldSize / 2))
-		{
-			Enemy[i].x += Enemy[i].speed;
-		}
-		else
-		{
-			Enemy[i].heading = LEFT;
-		}
-
-		if (Enemy[i].heading == LEFT && Enemy[i].x + (-radius * 2) > (-worldSize / 2))
-		{
-			Enemy[i].x -= Enemy[i].speed;
-		}
-		else
-		{
-			Enemy[i].heading = RIGHT;
-		}
-	}
-	glutPostRedisplay();
-	glutTimerFunc(100, amination, 1);
-}
-void collisionTimer(int value)
-{
 	if (easy)
 	{
-		for (int i = 0; i < 5; i + 2)
+		for (int i = 0; i < 5; i+=2)
 		{
+			animateLeftLeg();
+			animateRightLeg();
 			lookForCollision(Enemy[i], hero);
+
+			if (Enemy[i].heading == RIGHT && Enemy[i].x + (radius * 2) < (worldSize / 2))
+			{
+				Enemy[i].x += Enemy[i].speed;
+			}
+			else
+			{
+				Enemy[i].heading = LEFT;
+			}
+
+			if (Enemy[i].heading == LEFT && Enemy[i].x + (-radius * 2) > (-worldSize / 2))
+			{
+				Enemy[i].x -= Enemy[i].speed;
+			}
+			else
+			{
+				Enemy[i].heading = RIGHT;
+			}
 		}
 	}
 	else
 	{
 		for (int i = 0; i < 5; i++)
 		{
+			animateLeftLeg();
+			animateRightLeg();
 			lookForCollision(Enemy[i], hero);
+
+			if (Enemy[i].heading == RIGHT && Enemy[i].x + (radius * 2) < (worldSize / 2))
+			{
+				Enemy[i].x += Enemy[i].speed;
+			}
+			else
+			{
+				Enemy[i].heading = LEFT;
+			}
+
+			if (Enemy[i].heading == LEFT && Enemy[i].x + (-radius * 2) > (-worldSize / 2))
+			{
+				Enemy[i].x -= Enemy[i].speed;
+			}
+			else
+			{
+				Enemy[i].heading = RIGHT;
+			}
 		}
 	}
-	glutTimerFunc(100, collisionTimer, 5);
+	glutPostRedisplay();
+	glutTimerFunc(100, amination, 1);
 }
+
 void lookForCollision(struct spider enemy, struct spider hero)
 {
 	float distance = pow(hero.x - enemy.x, 2) + pow(hero.y - enemy.y,2);
@@ -549,7 +564,7 @@ int main(int argc, char** argv)
 	int windowWidth = windowSize / 2;
 	int windowHeight = windowSize / 2;
 	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
 	glutInitWindowSize(windowWidth, windowHeight);
 	glutInitWindowPosition(0, 0);
 	glutCreateWindow("spiderPigGame");
@@ -557,7 +572,6 @@ int main(int argc, char** argv)
 	glutDisplayFunc(display);		// draw scene
 	glutKeyboardFunc(keyboard);
 	glutTimerFunc(100, amination, 1);
-	//glutTimerFunc(100, collisionTimer, 5);
 	glutMainLoop();
 	return 0;
 }
