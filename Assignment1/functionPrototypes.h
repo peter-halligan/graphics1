@@ -8,3 +8,4 @@ void drawBody(void);
 void drawHead(void);
 void drawEye(void);
 void drawSpider(float *);
+void lookForCollision(struct spider, struct spider);

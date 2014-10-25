@@ -29,6 +29,11 @@ float upr_arm_len = radius * 1.5;
 int arm_width = 3;
 bool boundingCircleIsVisible = true;
 
+float rightLegAngle = -90;
+float leftLegAngle = 225;
+bool legForward = true;
+bool rightLegForward = true;
+
 float black[] = { 0.0, 0.0, 0.0 };
 float colors[] = { 0.0, 0.0, 0.0 };
 float red[] = { 1.0, 0.0, 0.0 };
@@ -44,3 +49,6 @@ struct spider
 	float speed;
 	float size;
 };
+
+struct spider Enemy[5];
+struct spider hero;

@@ -13,14 +13,7 @@
 #include "ctime"
 #include "cstdlib"
 
-struct spider Enemy[5];
-struct spider hero;
-float rightLegAngle = -90;
-float leftLegAngle = 225;
-bool legForward = true;
-bool rightLegForward = true;
-void lookForCollision(struct spider enemy, struct spider hero);
-void collisionTimer(int);
+
 
 void initialaize(void)
 {
