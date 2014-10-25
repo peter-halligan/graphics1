@@ -19,6 +19,7 @@ float rightLegAngle = -90;
 float leftLegAngle = 225;
 bool legForward = true;
 bool rightLegForward = true;
+void lookForCollision(struct spider enemy, struct spider hero);
 
 void initialaize(void)
 {
@@ -28,33 +29,37 @@ void initialaize(void)
 	Enemy[0].y = (worldSize / 2) - (radius * 2.5);
 	Enemy[0].heading = RIGHT;
 	Enemy[0].speed = radius;
-		// ((rand() % 100 + 1)/ 100);
+	Enemy[0].size = radius * 2;
 
 	Enemy[1].x = (-worldSize / 2) + (radius * 2.5);
 	Enemy[1].y = (worldSize / 5);
 	Enemy[1].heading = RIGHT;
 	Enemy[1].speed = radius / 2;
-	//((rand() % 100 + 1) / 100);
+	Enemy[1].size = radius * 2;;
 
 	Enemy[2].x = (-worldSize / 2) + (radius * 2.5);
 	Enemy[2].y = 0;
 	Enemy[2].heading = RIGHT;
 	Enemy[2].speed = radius / 4;
+	Enemy[2].size = radius * 2;
 
 	Enemy[3].x = (-worldSize / 2) + (radius * 2.5);
 	Enemy[3].y = (-worldSize / 5);
 	Enemy[3].heading = RIGHT;
 	Enemy[3].speed = radius;
+	Enemy[3].size = radius * 2;
 
 	Enemy[4].x = (-worldSize / 2) + (radius * 2.5);
 	Enemy[4].y = (-worldSize / 2) + (radius * 2.5);
 	Enemy[4].heading = RIGHT;
 	Enemy[4].speed = radius / 2;
+	Enemy[4].size = radius * 2;
 
 	hero.x = 0;
 	hero.y = (-worldSize / 2) + (radius * 2.5);
 	hero.heading = 0;
 	hero.speed = radius;
+	hero.size = radius * 2;
 
 	for (int j = 0; j < 3; j++)
 	{
@@ -117,6 +122,7 @@ void death(int value)
 	glutPostRedisplay();
 	glutTimerFunc(100, death, 2);
 }
+
 void drawRightLegs(float angle)
 {
 	glPushMatrix();
@@ -194,7 +200,14 @@ void drawSpider(float *colors)
 	//bounding circle
 		glPopMatrix();
 	glPushMatrix();
-		DrawBoundingCircle(0, 0, radius * 2, 360,colors);
+	if (easy)
+	{
+		DrawBoundingCircle(0, 0, radius * 2, 360, colors);
+	}
+	else
+	{
+		DrawBoundingCircle(0, 0, radius * 3, 360, colors);
+	}
 	glPopMatrix();
 		drawRightLegs(rightLegAngle);
 		drawLeftLegs(leftLegAngle);
@@ -290,7 +303,6 @@ void drawLowerArm()
 }
 void drawUpperArm()
 {
-	
 	glPushMatrix();
 	glScalef(upr_arm_len, arm_width, 0);
 	drawSquare();
@@ -478,7 +490,6 @@ void amination(int value)
 {
 	for (int i = 0; i < 5; i++)
 	{
-
 		animateLeftLeg();
 		animateRightLeg();
 
@@ -503,7 +514,35 @@ void amination(int value)
 	glutPostRedisplay();
 	glutTimerFunc(100, amination, 1);
 }
-
+void collisionTimer(int value)
+{
+	if (easy)
+	{
+		for (int i = 0; i < 5; i + 2)
+		{
+			lookForCollision(Enemy[i], hero);
+		}
+	}
+	else
+	{
+		for (int i = 0; i < 5; i++)
+		{
+			lookForCollision(Enemy[i], hero);
+		}
+	}
+	glutTimerFunc(100, collisionTimer, 5);
+}
+void lookForCollision(struct spider enemy, struct spider hero)
+{
+	float distance = pow(hero.x - enemy.x, 2) + pow(hero.y - enemy.y,2);
+	float combinedRadius = pow(enemy.size + hero.size,2);
+	printf("distance %f\ncombined radius %f", distance, combinedRadius);
+	if (distance <= combinedRadius)
+	{	
+		initialaize();
+		glutPostRedisplay();
+	}
+}
 // create a single buffered colour window
 int main(int argc, char** argv)
 {
@@ -518,7 +557,7 @@ int main(int argc, char** argv)
 	glutDisplayFunc(display);		// draw scene
 	glutKeyboardFunc(keyboard);
 	glutTimerFunc(100, amination, 1);
-	//glutTimerFunc(100, death, 2);
+	//glutTimerFunc(100, collisionTimer, 5);
 	glutMainLoop();
 	return 0;
 }

@@ -42,4 +42,5 @@ struct spider
 	double heading;
 	float colour[3];
 	float speed;
+	float size;
 };
